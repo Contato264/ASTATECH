@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASTATECH — Segurança Inteligente, Proteção de Verdade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1C5C3A;
+    --verde-meio: #2E7D52;
+    --verde-brilho: #3DAA6A;
+    --verde-neon: #4ade80;
+    --preto: #080C09;
+    --preto-medio: #0F1A12;
+    --preto-card: #111D14;
+    --branco: #F0F5F1;
+    --cinza: #8A9E8F;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--preto);
+    color: var(--branco);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR CUSTOMIZADO */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--verde-neon);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: exclusion;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(74, 222, 128, 0.5);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--preto); }
+  ::-webkit-scrollbar-thumb { background: var(--verde); border-radius: 2px; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 5vw;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 70px;
+    transition: background 0.5s, backdrop-filter 0.5s;
+  }
+  nav.scrolled {
+    background: rgba(8, 12, 9, 0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(30, 90, 58, 0.3);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.15em;
+    color: var(--branco);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo span { color: var(--verde-neon); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--cinza);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--verde-neon);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--branco); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    background: var(--verde);
+    color: var(--branco) !important;
+    padding: 10px 24px;
+    border-radius: 2px;
+    transition: background 0.3s !important;
+  }
+  .nav-cta:hover { background: var(--verde-brilho) !important; }
+  .nav-cta::after { display: none !important; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 100vh; min-height: 700px;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(8,12,9,0.3) 0%, rgba(8,12,9,0.1) 40%, rgba(8,12,9,0.85) 100%),
+      linear-gradient(135deg, rgba(28,92,58,0.15) 0%, transparent 50%);
+    z-index: 1;
+  }
+  /* Grade animada */
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(30,90,58,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,90,58,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 1;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0% { transform: perspective(600px) rotateX(20deg) translateY(0); }
+    100% { transform: perspective(600px) rotateX(20deg) translateY(60px); }
+  }
+
+  /* Camera feed grid overlay */
+  .cam-feeds {
+    position: absolute; inset: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    z-index: 0;
+    opacity: 0.12;
+  }
+  .cam-feed {
+    background: var(--preto-card);
+    border: 1px solid rgba(30,90,58,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .cam-feed::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(30,90,58,0.2), transparent);
+    animation: camFlicker 4s ease-in-out infinite;
+    animation-delay: calc(var(--d, 0) * 0.7s);
+  }
+  @keyframes camFlicker {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  .cam-feed:nth-child(1) { --d: 0; }
+  .cam-feed:nth-child(2) { --d: 1; grid-column: span 2; }
+  .cam-feed:nth-child(3) { --d: 2; }
+  .cam-feed:nth-child(4) { --d: 3; grid-row: span 2; }
+  .cam-feed:nth-child(5) { --d: 4; }
+  .cam-feed:nth-child(6) { --d: 5; }
+  .cam-feed:nth-child(7) { --d: 6; grid-column: span 2; }
+  .cam-feed:nth-child(8) { --d: 7; }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 0 8vw 8vh;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--verde-neon);
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 14rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--branco);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s forwards;
+  }
+  .hero-title .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(240,245,241,0.4);
+  }
+  .hero-tagline {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cinza);
+    margin-top: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+  .hero-tagline em { color: var(--verde-neon); font-style: normal; }
+  .hero-actions {
+    margin-top: 3rem;
+    display: flex; gap: 1.5rem; align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.9s 1s forwards;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--verde);
+    color: var(--branco);
+    text-decoration: none;
+    padding: 16px 36px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    border: none; cursor: none;
+  }
+  .btn-primary:hover {
+    background: var(--verde-brilho);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(28,92,58,0.5);
+  }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--cinza);
+    text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    cursor: none;
+  }
+  .btn-ghost:hover { color: var(--branco); }
+  .btn-ghost svg { transition: transform 0.3s; }
+  .btn-ghost:hover svg { transform: translateX(4px); }
+
+  /* REC indicator */
+  .rec-badge {
+    position: absolute; top: 90px; right: 5vw;
+    z-index: 10;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.7rem; letter-spacing: 0.2em;
+    font-weight: 600; text-transform: uppercase;
+    color: rgba(240,245,241,0.6);
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .rec-dot {
+    width: 8px; height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: recPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes recPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    50% { opacity: 0.5; box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute; bottom: 3rem; right: 5vw;
+    z-index: 10;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-hint span {
+    writing-mode: vertical-rl;
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--cinza);
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--verde-neon), transparent);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--preto-card);
+    border-top: 1px solid rgba(30,90,58,0.3);
+    border-bottom: 1px solid rgba(30,90,58,0.3);
+    padding: 2rem 8vw;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: linear-gradient(to right, rgba(30,90,58,0.2), rgba(30,90,58,0.2));
+  }
+  .stat-item {
+    padding: 1.5rem 2rem;
+    background: var(--preto-card);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .stat-item:hover { background: rgba(28,92,58,0.1); }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--verde-neon);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cinza);
+    margin-top: 0.3rem;
+    display: block;
+  }
+
+  /* SECTIONS */
+  section { padding: 8rem 8vw; }
+
+  .section-label {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    margin-bottom: 1.5rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--verde-neon);
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+  }
+  .section-sub {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--cinza);
+    max-width: 540px;
+  }
+
+  /* SOBRE / SPLIT */
+  .sobre {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    align-items: center;
+  }
+  .sobre-visual {
+    position: relative;
+    height: 500px;
+  }
+  .sobre-monitor {
+    position: absolute; inset: 0;
+    background: var(--preto-card);
+    border: 1px solid rgba(30,90,58,0.4);
+    border-radius: 4px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    padding: 12px;
+    gap: 6px;
+  }
+  .mini-cam {
+    background: #0a0f0b;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mini-cam::before {
+    content: attr(data-loc);
+    position: absolute; bottom: 6px; left: 8px;
+    font-size: 0.55rem; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    font-weight: 700;
+    z-index: 2;
+  }
+  .mini-cam::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg,
+      rgba(28,92,58,0.15) 0%,
+      transparent 60%,
+      rgba(28,92,58,0.05) 100%);
+    animation: camScan 3s ease-in-out infinite;
+    animation-delay: calc(var(--s,0) * 0.8s);
+  }
+  @keyframes camScan {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  .mini-cam:nth-child(1) { --s: 0; grid-column: span 2; }
+  .mini-cam:nth-child(2) { --s: 1; }
+  .mini-cam:nth-child(3) { --s: 2; }
+  .sobre-badge {
+    position: absolute;
+    bottom: -20px; right: -20px;
+    width: 130px; height: 130px;
+    background: var(--verde);
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    border: 4px solid var(--preto);
+  }
+  .sobre-badge strong {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: var(--branco);
+    line-height: 1;
+  }
+  .sobre-badge span {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(240,245,241,0.7);
+  }
+
+  /* SERVIÇOS */
+  .servicos-section { background: var(--preto-medio); }
+  .servicos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 4rem;
+    background: rgba(30,90,58,0.2);
+    border: 1px solid rgba(30,90,58,0.2);
+  }
+  .servico-card {
+    background: var(--preto-card);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: none;
+  }
+  .servico-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(to right, var(--verde), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .servico-card:hover::before { transform: scaleX(1); }
+  .servico-card:hover { background: rgba(28,92,58,0.08); }
+  .servico-icon {
+    width: 56px; height: 56px;
+    background: rgba(28,92,58,0.2);
+    border: 1px solid rgba(30,90,58,0.4);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    transition: background 0.3s;
+  }
+  .servico-card:hover .servico-icon {
+    background: rgba(28,92,58,0.4);
+  }
+  .servico-num {
+    position: absolute; top: 2rem; right: 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    color: rgba(30,90,58,0.15);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .servico-card:hover .servico-num { color: rgba(74,222,128,0.1); }
+  .servico-titulo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    color: var(--branco);
+  }
+  .servico-desc {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--cinza);
+  }
+  .servico-tag {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    border: 1px solid rgba(74,222,128,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* DIFERENCIAIS */
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 4rem;
+    background: rgba(30,90,58,0.15);
+  }
+  .diff-item {
+    background: var(--preto-card);
+    padding: 2.5rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    transition: background 0.3s;
+    cursor: none;
+  }
+  .diff-item:hover { background: rgba(28,92,58,0.08); }
+  .diff-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .diff-titulo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: var(--branco);
+  }
+  .diff-texto { font-size: 0.88rem; line-height: 1.7; color: var(--cinza); }
+
+  /* PROCESSO */
+  .processo-section { background: var(--preto-medio); }
+  .processo-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 4rem;
+    position: relative;
+    background: rgba(30,90,58,0.15);
+  }
+  .step {
+    background: var(--preto-card);
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .step:hover { background: rgba(28,92,58,0.08); }
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(30,90,58,0.2);
+    line-height: 1;
+    margin-bottom: 1rem;
+    display: block;
+    transition: color 0.3s;
+  }
+  .step:hover .step-num { color: rgba(74,222,128,0.15); }
+  .step-titulo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--branco);
+    margin-bottom: 0.75rem;
+  }
+  .step-desc { font-size: 0.85rem; line-height: 1.7; color: var(--cinza); }
+
+  /* GARANTIA */
+  .garantia-section {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .garantia-section::before {
+    content: 'ASTATECH';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20vw;
+    color: rgba(30,90,58,0.04);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .garantia-cards {
+    display: flex; gap: 2rem; justify-content: center;
+    margin-top: 4rem;
+    flex-wrap: wrap;
+  }
+  .garantia-card {
+    background: var(--preto-card);
+    border: 1px solid rgba(30,90,58,0.3);
+    padding: 3rem 2.5rem;
+    border-radius: 4px;
+    width: 280px;
+    text-align: center;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    cursor: none;
+  }
+  .garantia-card:hover {
+    border-color: var(--verde-neon);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(28,92,58,0.3);
+  }
+  .garantia-icon { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
+  .garantia-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: var(--verde-neon);
+    line-height: 1;
+  }
+  .garantia-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cinza);
+    margin-top: 0.3rem;
+  }
+  .garantia-desc {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--cinza);
+    margin-top: 1rem;
+  }
+
+  /* CONTATO */
+  .contato-section {
+    background: var(--preto-medio);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+  .contato-info { }
+  .contato-canais { display: flex; flex-direction: column; gap: 1rem; margin-top: 3rem; }
+  .canal {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--preto-card);
+    border: 1px solid rgba(30,90,58,0.2);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--branco);
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: none;
+  }
+  .canal:hover {
+    border-color: var(--verde-neon);
+    transform: translateX(6px);
+  }
+  .canal-icon {
+    width: 48px; height: 48px;
+    background: rgba(28,92,58,0.3);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .canal-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cinza);
+    display: block;
+  }
+  .canal-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-top: 2px;
+  }
+  .contato-form { }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cinza);
+    margin-bottom: 0.5rem;
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: var(--preto-card);
+    border: 1px solid rgba(30,90,58,0.3);
+    border-radius: 2px;
+    padding: 14px 16px;
+    color: var(--branco);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s;
+    cursor: none;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--verde-neon);
+  }
+  .form-group select option { background: var(--preto-card); color: var(--branco); }
+  .form-group textarea { resize: none; height: 120px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .btn-submit {
+    width: 100%;
+    background: var(--verde);
+    color: var(--branco);
+    border: none;
+    padding: 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: background 0.3s, box-shadow 0.3s;
+    cursor: none;
+  }
+  .btn-submit:hover {
+    background: var(--verde-brilho);
+    box-shadow: 0 8px 30px rgba(28,92,58,0.5);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--preto-card);
+    border-top: 1px solid rgba(30,90,58,0.3);
+    padding: 4rem 8vw 2rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 3rem;
+  }
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 0.1em;
+    color: var(--branco);
+    margin-bottom: 1rem;
+  }
+  .footer-brand span { color: var(--verde-neon); }
+  .footer-desc { font-size: 0.9rem; line-height: 1.7; color: var(--cinza); max-width: 320px; }
+  .footer-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    margin-bottom: 1.2rem;
+    font-weight: 700;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-links a {
+    text-decoration: none;
+    color: var(--cinza);
+    font-size: 0.9rem;
+    transition: color 0.3s;
+    cursor: none;
+  }
+  .footer-links a:hover { color: var(--verde-neon); }
+  .footer-bottom {
+    border-top: 1px solid rgba(30,90,58,0.2);
+    padding-top: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-size: 0.8rem; color: var(--cinza); }
+  .footer-social {
+    display: flex; gap: 1rem;
+  }
+  .social-link {
+    width: 38px; height: 38px;
+    background: rgba(28,92,58,0.2);
+    border: 1px solid rgba(30,90,58,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s, border-color 0.3s;
+    cursor: none;
+  }
+  .social-link:hover {
+    background: var(--verde);
+    border-color: var(--verde);
+  }
+
+  /* WA float */
+  .wa-float {
+    position: fixed;
+    bottom: 2.5rem; right: 2.5rem;
+    z-index: 200;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .wa-btn {
+    width: 58px; height: 58px;
+    background: #25d366;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 1.6rem;
+    animation: waPulse 3s ease-in-out infinite;
+    cursor: none;
+  }
+  @keyframes waPulse {
+    0%, 100% { box-shadow: 0 8px 25px rgba(37,211,102,0.4); }
+    50% { box-shadow: 0 8px 40px rgba(37,211,102,0.7); }
+  }
+  .wa-btn:hover { transform: scale(1.1); }
+  .wa-label {
+    background: var(--preto-card);
+    border: 1px solid rgba(30,90,58,0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .wa-float:hover .wa-label { opacity: 1; transform: translateX(0); }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* MOBILE */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .hero-title { font-size: clamp(4rem, 18vw, 8rem); }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .sobre { grid-template-columns: 1fr; }
+    .sobre-visual { display: none; }
+    .servicos-grid { grid-template-columns: 1fr; }
+    .diff-grid { grid-template-columns: 1fr; }
+    .processo-steps { grid-template-columns: 1fr 1fr; }
+    .garantia-cards { flex-direction: column; align-items: center; }
+    .contato-section { grid-template-columns: 1fr; gap: 3rem; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .form-row { grid-template-columns: 1fr; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">ASTA<span>TECH</span></a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#processo">Como Funciona</a></li>
+    <li><a href="#garantia">Garantia</a></li>
+    <li><a href="#contato" class="nav-cta">Solicitar Orçamento</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="cam-feeds">
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+    <div class="cam-feed"></div>
+  </div>
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="rec-badge">
+    <div class="rec-dot"></div>
+    MONITORAMENTO ATIVO
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Sistema de Segurança CFTV & IP</div>
+    <h1 class="hero-title">
+      ASTA<br><span class="line2">TECH</span>
+    </h1>
+    <p class="hero-tagline">
+      <em>Segurança Inteligente,</em> Proteção de Verdade.
+    </p>
+    <div class="hero-actions">
+      <a href="#contato" class="btn-primary">
+        Solicitar Orçamento Grátis
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#servicos" class="btn-ghost">
+        Ver Serviços
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item reveal">
+    <span class="stat-num" data-target="100">0</span>
+    <span class="stat-label">% Satisfação</span>
+  </div>
+  <div class="stat-item reveal reveal-delay-1">
+    <span class="stat-num">24/7</span>
+    <span class="stat-label">Suporte Técnico</span>
+  </div>
+  <div class="stat-item reveal reveal-delay-2">
+    <span class="stat-num">3</span>
+    <span class="stat-label">Meses de Garantia</span>
+  </div>
+  <div class="stat-item reveal reveal-delay-3">
+    <span class="stat-num">ABC</span>
+    <span class="stat-label">Grande São Paulo</span>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section id="sobre" style="padding: 8rem 8vw;">
+  <div class="sobre">
+    <div>
+      <div class="section-label reveal">Nossa Empresa</div>
+      <h2 class="section-title reveal">Proteção<br>que você<br>pode ver</h2>
+      <p class="section-sub reveal">
+        A ASTATECH é especializada em instalação de sistemas de câmeras de segurança CFTV e IP, atendendo residências, comércios e empresas na região do ABC Paulista. Trabalhamos com equipamentos de última geração, instalação profissional e suporte pós-venda real.
+      </p>
+      <div style="margin-top: 2.5rem; display: flex; flex-direction: column; gap: 0.8rem;" class="reveal">
+        <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: var(--cinza);">
+          <span style="color: var(--verde-neon); font-size: 1.2rem;">✓</span>
+          Câmeras CFTV analógicas com DVR
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: var(--cinza);">
+          <span style="color: var(--verde-neon); font-size: 1.2rem;">✓</span>
+          Câmeras IP com NVR — acesso remoto pelo celular
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: var(--cinza);">
+          <span style="color: var(--verde-neon); font-size: 1.2rem;">✓</span>
+          Orçamento gratuito e visita técnica sem compromisso
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: var(--cinza);">
+          <span style="color: var(--verde-neon); font-size: 1.2rem;">✓</span>
+          3 meses de manutenção gratuita inclusa
+        </div>
+      </div>
+    </div>
+    <div class="sobre-visual reveal">
+      <div class="sobre-monitor">
+        <div class="mini-cam" data-loc="Entrada Principal"></div>
+        <div class="mini-cam" data-loc="Câmera 02"></div>
+        <div class="mini-cam" data-loc="Câmera 03"></div>
+      </div>
+      <div class="sobre-badge">
+        <strong>ABC</strong>
+        <span>Paulista</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section id="servicos" class="servicos-section">
+  <div class="section-label reveal">O que fazemos</div>
+  <h2 class="section-title reveal">Nossos<br>Serviços</h2>
+  <div class="servicos-grid">
+    <div class="servico-card reveal">
+      <span class="servico-num">01</span>
+      <div class="servico-icon">📹</div>
+      <div class="servico-titulo">CFTV com DVR</div>
+      <p class="servico-desc">Instalação de sistemas analógicos de alta definição com DVR para gravação contínua. Ideal para residências e pequenos comércios com ótimo custo-benefício.</p>
+      <span class="servico-tag">Câmeras HD / Full HD</span>
+    </div>
+    <div class="servico-card reveal reveal-delay-1">
+      <span class="servico-num">02</span>
+      <div class="servico-icon">🌐</div>
+      <div class="servico-titulo">Câmeras IP com NVR</div>
+      <p class="servico-desc">Sistema digital de alta performance com acesso remoto pelo celular em tempo real. Grave, monitore e receba alertas de qualquer lugar do mundo.</p>
+      <span class="servico-tag">Acesso Remoto 24/7</span>
+    </div>
+    <div class="servico-card reveal reveal-delay-2">
+      <span class="servico-num">03</span>
+      <div class="servico-icon">🔧</div>
+      <div class="servico-titulo">Instalação Profissional</div>
+      <p class="servico-desc">Passagem de cabos, posicionamento estratégico das câmeras, configuração completa do sistema e treinamento do cliente para uso.</p>
+      <span class="servico-tag">Instalação & Config</span>
+    </div>
+    <div class="servico-card reveal reveal-delay-3">
+      <span class="servico-num">04</span>
+      <div class="servico-icon">🏠</div>
+      <div class="servico-titulo">Residencial</div>
+      <p class="servico-desc">Proteja sua casa, família e patrimônio. Projetos personalizados para casas e apartamentos com câmeras discretas e eficientes.</p>
+      <span class="servico-tag">Casa & Família</span>
+    </div>
+    <div class="servico-card reveal">
+      <span class="servico-num">05</span>
+      <div class="servico-icon">🏪</div>
+      <div class="servico-titulo">Comercial</div>
+      <p class="servico-desc">Segurança para lojas, escritórios, restaurantes e galpões. Reduza perdas, monitore equipes e tenha provas em vídeo sempre que precisar.</p>
+      <span class="servico-tag">Comércio & Empresa</span>
+    </div>
+    <div class="servico-card reveal reveal-delay-1">
+      <span class="servico-num">06</span>
+      <div class="servico-icon">🔄</div>
+      <div class="servico-titulo">Manutenção & Suporte</div>
+      <p class="servico-desc">Manutenção preventiva e corretiva para sistemas existentes. Limpeza de câmeras, verificação de gravações, atualização de firmware e suporte técnico.</p>
+      <span class="servico-tag">Suporte Contínuo</span>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section id="diferenciais" style="padding: 8rem 8vw;">
+  <div class="section-label reveal">Por que a ASTATECH</div>
+  <h2 class="section-title reveal">Nossos<br>Diferenciais</h2>
+  <div class="diff-grid">
+    <div class="diff-item reveal">
+      <div class="diff-icon">🎯</div>
+      <div>
+        <div class="diff-titulo">Projeto Personalizado</div>
+        <p class="diff-texto">Cada cliente tem necessidades únicas. Fazemos uma avaliação técnica no local antes de qualquer orçamento, garantindo a solução ideal para o seu espaço.</p>
+      </div>
+    </div>
+    <div class="diff-item reveal reveal-delay-1">
+      <div class="diff-icon">💰</div>
+      <div>
+        <div class="diff-titulo">Melhor Custo-Benefício</div>
+        <p class="diff-texto">Trabalhamos com equipamentos de qualidade e preço justo, sem surpresas. Transparência total no orçamento — o que foi combinado é o que você paga.</p>
+      </div>
+    </div>
+    <div class="diff-item reveal reveal-delay-2">
+      <div class="diff-icon">📱</div>
+      <div>
+        <div class="diff-titulo">Acesso pelo Celular</div>
+        <p class="diff-texto">Configure o acesso remoto e monitore seu imóvel em tempo real pelo smartphone, de qualquer lugar. Câmeras IP com notificações de movimento.</p>
+      </div>
+    </div>
+    <div class="diff-item reveal reveal-delay-3">
+      <div class="diff-icon">🛡️</div>
+      <div>
+        <div class="diff-titulo">Garantia Real</div>
+        <p class="diff-texto">3 meses de manutenção preventiva e suporte técnico inclusos após a instalação. Problema? A ASTATECH resolve — sem custo adicional no período.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESSO -->
+<section id="processo" class="processo-section">
+  <div class="section-label reveal">Como Trabalhamos</div>
+  <h2 class="section-title reveal">Da Visita à<br>Instalação</h2>
+  <div class="processo-steps">
+    <div class="step reveal">
+      <span class="step-num">01</span>
+      <div class="step-titulo">Contato & Avaliação</div>
+      <p class="step-desc">Entre em contato via WhatsApp ou e-mail. Agendamos uma visita técnica gratuita para avaliar o local e entender sua necessidade.</p>
+    </div>
+    <div class="step reveal reveal-delay-1">
+      <span class="step-num">02</span>
+      <div class="step-titulo">Orçamento Detalhado</div>
+      <p class="step-desc">Enviamos um orçamento completo e transparente com todos os itens incluídos — equipamentos, cabos, mão de obra e configuração.</p>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <span class="step-num">03</span>
+      <div class="step-titulo">Instalação Profissional</div>
+      <p class="step-desc">Aprovado o orçamento, agendamos a instalação. Trabalhamos com organização e cuidado para não comprometer seu espaço.</p>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <span class="step-num">04</span>
+      <div class="step-titulo">Entrega & Suporte</div>
+      <p class="step-desc">Configuramos tudo, treinamos o cliente e ativamos o acesso remoto. 3 meses de garantia e manutenção inclusa na entrega.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GARANTIA -->
+<section id="garantia" class="garantia-section">
+  <div class="section-label reveal" style="justify-content: center;">Compromisso</div>
+  <h2 class="section-title reveal" style="text-align: center;">Nossa<br>Garantia</h2>
+  <div class="garantia-cards">
+    <div class="garantia-card reveal">
+      <span class="garantia-icon">🛡️</span>
+      <div class="garantia-num">3</div>
+      <div class="garantia-label">Meses de Manutenção Gratuita</div>
+      <p class="garantia-desc">Após a instalação, oferecemos 3 meses de manutenção preventiva e suporte técnico sem custo adicional.</p>
+    </div>
+    <div class="garantia-card reveal reveal-delay-1">
+      <span class="garantia-icon">💳</span>
+      <div class="garantia-num">50/50</div>
+      <div class="garantia-label">Forma de Pagamento Justa</div>
+      <p class="garantia-desc">50% de entrada para iniciar o projeto e os outros 50% somente na conclusão e entrega, com tudo funcionando.</p>
+    </div>
+    <div class="garantia-card reveal reveal-delay-2">
+      <span class="garantia-icon">📞</span>
+      <div class="garantia-num">24/7</div>
+      <div class="garantia-label">Suporte via WhatsApp</div>
+      <p class="garantia-desc">Estamos disponíveis para dúvidas e suporte pelo WhatsApp. Resposta rápida e atendimento humanizado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section id="contato" class="contato-section">
+  <div class="contato-info">
+    <div class="section-label reveal">Fale Conosco</div>
+    <h2 class="section-title reveal">Solicite seu<br>Orçamento<br>Grátis</h2>
+    <p class="section-sub reveal" style="margin-bottom: 0;">
+      Atendemos toda a região do ABC Paulista. Entre em contato e receba uma avaliação técnica gratuita e sem compromisso.
+    </p>
+    <div class="contato-canais">
+      <a href="https://wa.me/5511932289146" target="_blank" class="canal reveal">
+        <div class="canal-icon">💬</div>
+        <div>
+          <span class="canal-label">WhatsApp</span>
+          <span class="canal-value">(11) 93228-9146</span>
+        </div>
+      </a>
+      <a href="mailto:contato@astatech.com.br" class="canal reveal reveal-delay-1">
+        <div class="canal-icon">📧</div>
+        <div>
+          <span class="canal-label">E-mail</span>
+          <span class="canal-value">contato@astatech.com.br</span>
+        </div>
+      </a>
+      <a href="https://instagram.com/_astatech" target="_blank" class="canal reveal reveal-delay-2">
+        <div class="canal-icon">📷</div>
+        <div>
+          <span class="canal-label">Instagram</span>
+          <span class="canal-value">@_astatech</span>
+        </div>
+      </a>
+      <div class="canal reveal reveal-delay-3">
+        <div class="canal-icon">📍</div>
+        <div>
+          <span class="canal-label">Área de Atendimento</span>
+          <span class="canal-value">ABC Paulista — Grande SP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="contato-form reveal">
+    <form onsubmit="enviarWhatsApp(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" id="f-nome" placeholder="Seu nome" required>
+        </div>
+        <div class="form-group">
+          <label>Telefone / WhatsApp</label>
+          <input type="tel" id="f-tel" placeholder="(11) 9xxxx-xxxx" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Imóvel</label>
+        <select id="f-tipo">
+          <option value="">Selecione...</option>
+          <option>Residência</option>
+          <option>Comércio / Loja</option>
+          <option>Escritório</option>
+          <option>Galpão / Indústria</option>
+          <option>Condomínio</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantas câmeras aproximadamente?</label>
+        <select id="f-cam">
+          <option value="">Selecione...</option>
+          <option>1 a 4 câmeras</option>
+          <option>5 a 8 câmeras</option>
+          <option>9 a 16 câmeras</option>
+          <option>Mais de 16 câmeras</option>
+          <option>Não sei, preciso de avaliação</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mensagem (opcional)</label>
+        <textarea id="f-msg" placeholder="Conte um pouco mais sobre sua necessidade..."></textarea>
+      </div>
+      <button type="submit" class="btn-submit">
+        Enviar pelo WhatsApp →
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">ASTA<span>TECH</span></div>
+      <p class="footer-desc">Segurança Inteligente, Proteção de Verdade. Instalação profissional de câmeras CFTV e IP no ABC Paulista e Grande São Paulo.</p>
+    </div>
+    <div>
+      <div class="footer-title">Serviços</div>
+      <ul class="footer-links">
+        <li><a href="#servicos">Câmeras CFTV + DVR</a></li>
+        <li><a href="#servicos">Câmeras IP + NVR</a></li>
+        <li><a href="#servicos">Instalação Residencial</a></li>
+        <li><a href="#servicos">Instalação Comercial</a></li>
+        <li><a href="#servicos">Manutenção & Suporte</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-title">Contato</div>
+      <ul class="footer-links">
+        <li><a href="https://wa.me/5511932289146" target="_blank">WhatsApp: (11) 93228-9146</a></li>
+        <li><a href="mailto:contato@astatech.com.br">contato@astatech.com.br</a></li>
+        <li><a href="https://instagram.com/_astatech" target="_blank">@_astatech</a></li>
+        <li><a href="#inicio">ABC Paulista — SP</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 ASTATECH. Todos os direitos reservados.</p>
+    <div class="footer-social">
+      <a href="https://instagram.com/_astatech" target="_blank" class="social-link">📷</a>
+      <a href="https://wa.me/5511932289146" target="_blank" class="social-link">💬</a>
+      <a href="mailto:contato@astatech.com.br" class="social-link">📧</a>
+    </div>
+  </div>
+</footer>
+
+<!-- WA FLOAT -->
+<div class="wa-float">
+  <span class="wa-label">Pedir Orçamento Grátis</span>
+  <a href="https://wa.me/5511932289146?text=Olá!%20Vim%20pelo%20site%20da%20ASTATECH%20e%20gostaria%20de%20solicitar%20um%20orçamento." target="_blank" class="wa-btn">💬</a>
+</div>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  setTimeout(() => {
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  }, 80);
+});
+document.querySelectorAll('a, button, .servico-card, .garantia-card, .diff-item, .canal, .step').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '20px';
+    cursor.style.height = '20px';
+    ring.style.width = '60px';
+    ring.style.height = '60px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '12px';
+    cursor.style.height = '12px';
+    ring.style.width = '36px';
+    ring.style.height = '36px';
+  });
+});
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// Counter animation
+const counters = document.querySelectorAll('.stat-num[data-target]');
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const target = +e.target.dataset.target;
+      let count = 0;
+      const inc = target / 60;
+      const timer = setInterval(() => {
+        count += inc;
+        if (count >= target) { count = target; clearInterval(timer); }
+        e.target.textContent = Math.floor(count) + '+';
+      }, 16);
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+counters.forEach(el => counterObs.observe(el));
+
+// Form → WhatsApp
+function enviarWhatsApp(e) {
+  e.preventDefault();
+  const nome = document.getElementById('f-nome').value;
+  const tel = document.getElementById('f-tel').value;
+  const tipo = document.getElementById('f-tipo').value;
+  const cam = document.getElementById('f-cam').value;
+  const msg = document.getElementById('f-msg').value;
+  const texto = `Olá! Vim pelo site da ASTATECH e gostaria de solicitar um orçamento.%0A%0A*Nome:* ${nome}%0A*Telefone:* ${tel}%0A*Tipo de Imóvel:* ${tipo || 'Não informado'}%0A*Câmeras:* ${cam || 'A definir'}%0A*Mensagem:* ${msg || 'Sem observações'}`;
+  window.open(`https://wa.me/5511932289146?text=${texto}`, '_blank');
+}
+
+// Smooth scroll para links internos
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
